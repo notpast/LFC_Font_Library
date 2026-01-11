@@ -1,0 +1,13 @@
+lfc_font.c:146:16:_LFC_Print_Chr	96	static
+lfc_font.c:19:10:LFC_Utf8_To_Utf32	40	static
+lfc_font.c:96:10:LFC_Get_Chr_Index	24	static
+lfc_font.c:450:9:LFC_Str_Rect	80	static
+lfc_font.c:746:9:LFC_Draw_Rect	56	static
+lfc_font.c:339:16:_LFC_Print	72	static
+lfc_font.c:804:10:LFC_Str_Width	24	static
+lfc_font.c:832:9:LFC_Print	40	static
+lfc_font.c:873:9:LFC_Utf32_To_Utf8	8	static
+lfc_font.c:944:9:LFC_Copy_Print_Form	0	static
+lfc_font.c:974:9:LFC_Check_Font	16	static
+lfc_font.c:1032:9:LFC_Print_Utf32_Chr	48	static
+lfc_font.c:1071:9:LFC_Utf32_Char_Rect	40	static
