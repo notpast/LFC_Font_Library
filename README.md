@@ -8,6 +8,7 @@ LFC is an ultra-compact, memory-efficient bitmap font library designed specifica
 ## Key Features
 
   ### Ultra-Compact Memory Footprint
+
   - Tiny font files: ~4KB for code space, ~3KB for 24px ASCII fonts
 	- Zero heap usage: Completely malloc-free design
 	- Minimal overhead: < 100 bytes RAM usage per display context
@@ -15,6 +16,7 @@ LFC is an ultra-compact, memory-efficient bitmap font library designed specifica
 
 
  ### Full Unicode Support  
+
 	- Complete UTF-8 encoding/decoding
 	- Direct UTF-32 character rendering
 	- Multi-language text capabilities
@@ -29,6 +31,7 @@ LFC is an ultra-compact, memory-efficient bitmap font library designed specifica
 
 
 ###  Professional Text Rendering  
+
   - Configurable character spacing and padding
 	- Text inversion (black/white mode)
 	- Bounding box visualization
