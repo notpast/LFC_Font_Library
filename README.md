@@ -117,15 +117,6 @@ The library uses the PRINT_FORM structure to write text or icons to the display.
 	// Padding text
 	print_form.padding=0;
 
-	// Text
-	uint8_t str[]="LFC Text";
-
-	// Text position: X coordinate
-	int16_t pos_x=10;
-
-	// Text position: Y coordinate
-	int16_t pos_y=10;
-
 
 ```
 
@@ -136,9 +127,16 @@ You can display any UTF-8 string or icon on the screen using the LFC_Print_Str f
 
 ```c
 
-  uint8_t str[]="Hello World";
-	// Print text
-	LFC_Print(&print_form,str,pos_x,pos_y);
+// Display coordinates for text placement
+// (0,0) is typically bottom-left corner of the display
+int16_t pos_x = 10;  // X coordinate: 10 pixels from left edge
+int16_t pos_y = 10;  // Y coordinate: 10 pixels from bottom edge
+
+// Text content to display
+uint8_t display_text[] = "Hello World";
+
+// Render text on screen using configured print format
+LFC_Print(&print_form, display_text, pos_x, pos_y);
 
 ```
 
