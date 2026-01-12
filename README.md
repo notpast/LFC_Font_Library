@@ -54,8 +54,9 @@ To use the LFC font library, include the lfc_font.h file in your desired source 
 Example Code:
 
 ```c
-// Include LFC font library
-#include "lfc_font_lib/lfc_font.h"
+
+	// Include LFC font library
+	#include "lfc_font_lib/lfc_font.h"
 
 ```
 
@@ -65,18 +66,69 @@ Example Code:
 
 Define a variable using the DISPLAY_CONTEXT structure defined in lfc_font.h and store your display's specifications within this structure.
 
-Example Code:
+```c
+
+
+	DISPLAY_CONTEXT device_display;
+
+	// Set display properties (for ssd1306)
+	device_display.width		      = 128; // Display width
+	device_display.height		      = 64;  // Display height
+	device_display.rotation	      = 0;	 // Screen rotation (0-3), 0: 0, 1:90, 2:180, 3:270 degree
+	device_display.set_pixel_func = SSD1306_Set_Pixel; // Pixel write function, it defined in your display library
+
+
+
+```
 
 
 ### Step 4: Configure Print Form
 
 The library uses the PRINT_FORM structure to write text or icons to the display. Define a variable using this structure and configure the C8 font array and other text display properties.
 
-Example Code:
+```c
+
+
+	// Create print form
+	PRINT_FORM print_form;
+
+	// Set displayer
+	print_form.display_context = &main_display;
+
+	// Set font (it defined in fonts/C8_fonts.h)
+	print_form.font=Goldman_Regular_16;
+
+	// Disable all extra properties
+	print_form.config=LFC_DEFAULT_CONFIG;
+
+	// Extra space between characters
+	print_form.spacing=0;
+
+	// Padding text
+	print_form.padding=0;
+
+	// Text
+	uint8_t str[]="LFC Text";
+
+	// Text position: X coordinate
+	int16_t pos_x=10;
+
+	// Text position: Y coordinate
+	int16_t pos_y=10;
+
+
+```
 
 
 ### Step 5: Display Text or Icons
 
 You can display any UTF-8 string or icon on the screen using the LFC_Print_Str function.
 
-Example Code:
+```c
+	
+
+	// Print text
+	LFC_Print(&print_form,str,pos_x,pos_y);
+
+
+```
