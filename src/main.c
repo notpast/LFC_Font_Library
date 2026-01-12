@@ -141,7 +141,7 @@ int main(void) {
 
 	//Text_With_Extra_Space(&main_display);
 
-	//Text_With_Boundary_Box(&main_display);
+	Text_With_Boundary_Box(&main_display);
 
 }
 
