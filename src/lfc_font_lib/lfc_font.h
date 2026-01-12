@@ -48,10 +48,7 @@ extern "C" {
 
 
 #include <stdint.h>
-
-#ifndef NULL
-#define NULL  (void*)0
-#endif
+#include <stddef.h>
 
 
 // Set pixel function prototype
@@ -117,7 +114,7 @@ typedef struct{
  * @return: 0 on success, 1 on error
  *
  */
-uint8_t LFC_Str_Rect(PRINT_FORM *frint_form, const uint8_t * str,int16_t x,int16_t y,LFC_RECT *rect);
+uint8_t LFC_Str_Rect(PRINT_FORM *print_form, const uint8_t * str,int16_t x,int16_t y,LFC_RECT *rect);
 
 
 /*

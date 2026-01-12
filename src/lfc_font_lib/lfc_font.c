@@ -111,8 +111,9 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 
 		// Compare 4-byte UTF-32 code with font entry
 		for (i = 0; i < 4; i++) {
-			if (u32_code[i] != font[ind + i])
+			if (u32_code[i] != font[ind + i]){
 				break;
+			}
 		}
 
 		// If all 4 bytes matched, extract character data offset
@@ -124,7 +125,7 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 		}
 	}
 
-	return 0; // Character not found in font
+	return 0; // Character not found in the font
 }
 
 /**
@@ -839,6 +840,8 @@ int16_t LFC_Print(PRINT_FORM * print_form, const uint8_t * str, int16_t pos_x, i
 		return 0;
 	}
 
+	pos_x+=print_form->padding;
+	pos_y+=print_form->padding;
 
 	// If set boundary box draw it and show string
 	if(print_form->config & LFC_BOUNDING_BOX){
