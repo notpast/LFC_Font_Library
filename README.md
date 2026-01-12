@@ -38,6 +38,18 @@ LFC is an ultra-compact, memory-efficient bitmap font library designed specifica
 
 
 
+## LFC Font Library - Dependencies
+### 1. Display Driver / Pixel Writing Function
+
+The library requires a display-specific driver or a pixel writing function compatible with your embedded system's display hardware.
+
+**What you need to implement:**
+- A hardware-specific function that writes individual pixels to your display
+- Display resolution
+
+### 2. C8 Bitmap Font (Converted via LFC Font Converter)
+The library requires C8 format bitmap fonts that must be converted using the LFC Font Converter tool.
+
 
 # LFC Font Library - Installation and Usage Guide
 ## How to Install
@@ -50,8 +62,6 @@ First, copy the lfc_font_lib folder and add it to your project. The folder conta
 ### Step 2: Include the Header File
 
 To use the LFC font library, include the lfc_font.h file in your desired source file using the #include directive.
-
-Example Code:
 
 ```c
 
@@ -95,7 +105,7 @@ The library uses the PRINT_FORM structure to write text or icons to the display.
 	// Set displayer
 	print_form.display_context = &main_display;
 
-	// Set font (it defined in fonts/C8_fonts.h)
+	// Set font (it defined in fonts/C8_fonts.h Create by LFC Font Converter)
 	print_form.font=Goldman_Regular_16;
 
 	// Disable all extra properties
@@ -125,10 +135,10 @@ The library uses the PRINT_FORM structure to write text or icons to the display.
 You can display any UTF-8 string or icon on the screen using the LFC_Print_Str function.
 
 ```c
-	
 
 	// Print text
 	LFC_Print(&print_form,str,pos_x,pos_y);
 
-
 ```
+
+
