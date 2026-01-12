@@ -46,14 +46,18 @@ LFC is an ultra-compact, memory-efficient bitmap font library designed specifica
 
 First, copy the lfc_font_lib folder and add it to your project. The folder contains two files. Alternatively, you can add only these two files directly to your project if you prefer.
 
-Example Code:
-
 
 ### Step 2: Include the Header File
 
 To use the LFC font library, include the lfc_font.h file in your desired source file using the #include directive.
 
 Example Code:
+
+```c
+// Include LFC font library
+#include "lfc_font_lib/lfc_font.h"
+
+```
 
 
 
