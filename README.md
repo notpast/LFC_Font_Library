@@ -72,9 +72,9 @@ Define a variable using the DISPLAY_CONTEXT structure defined in lfc_font.h and 
 	DISPLAY_CONTEXT device_display;
 
 	// Set display properties (for ssd1306)
-	device_display.width		      = 128; // Display width
-	device_display.height		      = 64;  // Display height
-	device_display.rotation	      = 0;	 // Screen rotation (0-3), 0: 0, 1:90, 2:180, 3:270 degree
+	device_display.width          = 128; // Display width
+	device_display.height         = 64;  // Display height
+	device_display.rotation       = 0;	 // Screen rotation (0-3), 0: 0, 1:90, 2:180, 3:270 degree
 	device_display.set_pixel_func = SSD1306_Set_Pixel; // Pixel write function, it defined in your display library
 
 
