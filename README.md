@@ -136,6 +136,7 @@ You can display any UTF-8 string or icon on the screen using the LFC_Print_Str f
 
 ```c
 
+  uint8_t str[]="Hello World";
 	// Print text
 	LFC_Print(&print_form,str,pos_x,pos_y);
 
