@@ -3,3 +3,4 @@ examples.c:44:9:Vertical_Center	24	static
 examples.c:71:6:Simple_Print_Text	32	static
 examples.c:115:6:Text_With_Extra_Space	32	static
 examples.c:158:6:Text_With_Boundary_Box	32	static
+examples.c:201:6:Google_Icons_Test	56	static

@@ -19,52 +19,6 @@
 
 
 
-int16_t Horizontal_Center(PRINT_FORM * p_form,uint8_t *str){
-	LFC_RECT rect;
-
-	if(LFC_Str_Rect(p_form, str,0,0,&rect)){
-		return 0; //Error
-	}
-
-	uint16_t screen_width;
-
-	uint8_t rotation=p_form->display_context->rotation;
-
-	// 0 and 180 degree
-	if( (rotation%2)==0) {
-		screen_width=p_form->display_context->width;
-	}else{
-		screen_width=p_form->display_context->height;
-	}
-
-	return (screen_width-rect.width)/2;
-}
-
-
-int16_t Vertical_Center(PRINT_FORM * p_form,uint8_t *str){
-	LFC_RECT rect;
-
-	if(LFC_Str_Rect(p_form, str,0,0,&rect)){
-		return 0; //Error
-	}
-
-	uint16_t screen_height;
-
-	uint8_t rotation=p_form->display_context->rotation;
-
-	// 0 and 180 degree
-	if( (rotation%2)==0) {
-		screen_height=p_form->display_context->height;
-	}else{
-		screen_height=p_form->display_context->width;
-	}
-
-	return (screen_height-rect.height)/2;
-}
-
-
-
-
 
 
 
@@ -194,3 +148,5 @@ void Text_With_Boundary_Box(DISPLAY_CONTEXT * main_display){
 	SSD1306_Flush();
 
 }
+
+
