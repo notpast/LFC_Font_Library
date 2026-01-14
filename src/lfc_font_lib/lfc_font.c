@@ -100,9 +100,53 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 		return 0;
 	}
 
-	uint8_t i, u;
+	uint8_t i;
 	uint16_t ind = 0;
 	uint16_t cind = 0;
+
+
+	// Binary search
+	uint16_t list_start;
+	uint16_t list_end;
+	uint16_t list_current;
+
+    list_start=0;
+    list_end=character_count-1;
+
+    while(list_end>=list_start){
+
+        list_current=list_start+(list_end-list_start)/2;
+
+		// Compare 4-byte UTF-32 code with font entry
+		for (i = 0; i < 4; i++) {
+			if (u32_code[i] < font[list_current + i]){
+				list_end=list_current-1;
+				break;
+			}else if (u32_code[i] > font[list_current + i]){
+				list_start=list_current+1;
+				break;
+			}
+		}
+
+		// If all 4 bytes matched, extract character data offset
+		if (i == 4) {
+			ind += 4; // Move to offset bytes in character map entry
+			cind = font[list_current++]; // Read LSB of offset
+			cind |= ((uint16_t) (font[list_current++])) << 8; // Read MSB of offset
+			return cind;
+		}
+
+    }
+
+    return 0;
+
+
+
+
+
+    /*
+
+	uint8_t u;
 
 	// Iterate through all characters in font character map
 	for (u = 0; u < character_count; u++) {
@@ -126,6 +170,11 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 	}
 
 	return 0; // Character not found in the font
+
+	*/
+
+
+
 }
 
 /**
@@ -265,8 +314,6 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 
 
 	// This code would clip characters at screen boundaries
-	// Disabled for performance
-	/*
 	if(max_x>screen_width){
 		max_x=screen_width;
 	}
@@ -280,7 +327,7 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 	if(min_y<0){
 		min_y=0;
 	}
-	*/
+
 
 
 	// Iterate through each pixel in character bitmap
@@ -493,7 +540,7 @@ uint8_t LFC_Str_Rect(PRINT_FORM * print_form,const uint8_t * str, int16_t x, int
 	// Parse font header (same as rendering function)
 	ind = 0;
 	font_signature = font[ind++];
-	if (font_signature != 0xC8) {
+	if (font_signature != LFC_C8_FONT_SIGNATURE) {
 		return 1;
 	}
 
@@ -984,11 +1031,11 @@ uint8_t LFC_Check_Font(const uint8_t * font){
 	}
 
 
-	if(font[ind++]!=0xC8){
+	if(font[ind++]!=LFC_C8_FONT_SIGNATURE){
 		return 2; // Error signature, format error
 	}
 
-	if(font[ind++]!=0x05){
+	if(font[ind++]!=LFC_C8_FONT_HEADER_LEN){
 		return 3; // Error structure length
 	}
 

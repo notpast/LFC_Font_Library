@@ -63,12 +63,15 @@ typedef void ( *CB_Set_Pixel)(uint16_t x,uint16_t y,uint8_t c);
 #define LFC_FILL 1
 #define LFC_LINE 0
 
-
+// Print form configuration properties
 #define LFC_SPACING    		 0X40 // Use extra spacing
 #define LFC_INVERT     		 0X20 // Invert pixel
 #define LFC_BOUNDING_BOX     0X10 // Show bounding box
-
 #define LFC_DEFAULT_CONFIG   0X00 // Default text configurations
+
+// C8 font signature
+#define LFC_C8_FONT_SIGNATURE  0XC8
+#define LFC_C8_FONT_HEADER_LEN 0X05
 
 
 // Use structure for computing string bounding box
