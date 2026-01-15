@@ -3,8 +3,6 @@
 #include "lfc_font.h"
 
 
-#define GET_PIXEL(array,n)     ( ((array)[(n) >> 3])  &  (0x80>>((n)&7)) )
-
 
 /**
  * @brief Converts UTF-8 character code to UTF-32 code (4 bytes)
@@ -175,8 +173,19 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 
 	*/
 
+}
 
 
+static inline uint8_t LFC_Get_Bit(const uint8_t *font,uint16_t ind,uint16_t bitmap_width,uint16_t fx,uint16_t fy){
+
+	uint16_t byte_index=(fy * bitmap_width + fx);
+	uint8_t  bit_index = 7 - (byte_index & 0x07); // calculate bit address  font_index%8
+	byte_index = ind + (byte_index >> 3);         // calculate byte address font_index/8
+
+	// Extract pixel value from bitmap data (1 bit per pixel)
+	uint8_t bit_status=(font[byte_index] >> bit_index) & 0x01;
+
+	return bit_status;
 }
 
 /**
@@ -337,8 +346,19 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 				fx = x - min_x;
 			}
 
+			/*
+			uint16_t byte_index=(fy * bitmap_width + fx);
+			uint8_t  bit_index = 7 - (byte_index & 0x07); // calculate bit address  font_index%8
+			byte_index = ind + (byte_index >> 3);         // calculate byte address font_index/8
+
 			// Extract pixel value from bitmap data (1 bit per pixel)
-			bit_status = GET_PIXEL((&font[ind]), (fy * bitmap_width + fx));
+			//bit_status = GET_PIXEL((&font[ind]), (fy * bitmap_width + fx));
+
+			bit_status=(font[byte_index]>>bit_index)&0x01;
+			*/
+
+			bit_status = LFC_Get_Bit(font, ind, bitmap_width, fx, fy);
+
 
 			// Apply inversion if requested
 			if (invert) {
