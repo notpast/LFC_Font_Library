@@ -1,3 +1,3 @@
-examples.c:25:6:Simple_Print_Text	32	static
-examples.c:69:6:Text_With_Extra_Space	32	static
-examples.c:112:6:Text_With_Boundary_Box	32	static
+examples.c:21:6:Simple_Print_Text	32	static
+examples.c:65:6:Text_With_Extra_Space	32	static
+examples.c:108:6:Text_With_Boundary_Box	48	static

@@ -16,8 +16,7 @@ void Text_With_Extra_Space(DISPLAY_CONTEXT * main_display);
 void Text_With_Boundary_Box(DISPLAY_CONTEXT * main_display);
 
 
-void Google_Icons_Test(DISPLAY_CONTEXT * main_display);
-
+void Font_Awesome_Example(DISPLAY_CONTEXT * main_display);
 
 
 #endif /* EXAMPLES_EXAMPLES_H_ */

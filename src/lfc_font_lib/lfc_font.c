@@ -100,7 +100,7 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 		return 0;
 	}
 
-	uint8_t i;
+	int8_t i;
 	uint16_t ind = 0;
 	uint16_t cind = 0;
 
@@ -117,22 +117,24 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 
         list_current=list_start+(list_end-list_start)/2;
 
+        ind = cmap_start + list_current * 6;
+
 		// Compare 4-byte UTF-32 code with font entry
-		for (i = 0; i < 4; i++) {
-			if (u32_code[i] < font[list_current + i]){
-				list_end=list_current-1;
+		for (i = 3; i > -1; i--) {
+			if (u32_code[i] < font[ind + i]){
+				list_end = list_current-1;
 				break;
-			}else if (u32_code[i] > font[list_current + i]){
+			}else if (u32_code[i] > font[ind + i]){
 				list_start=list_current+1;
 				break;
 			}
 		}
 
 		// If all 4 bytes matched, extract character data offset
-		if (i == 4) {
+		if (i == -1) {
 			ind += 4; // Move to offset bytes in character map entry
-			cind = font[list_current++]; // Read LSB of offset
-			cind |= ((uint16_t) (font[list_current++])) << 8; // Read MSB of offset
+			cind = font[ind++]; // Read LSB of offset
+			cind |= ((uint16_t) (font[ind++])) << 8; // Read MSB of offset
 			return cind;
 		}
 
@@ -144,8 +146,8 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 
 
 
+    // Linear search
     /*
-
 	uint8_t u;
 
 	// Iterate through all characters in font character map
@@ -310,22 +312,6 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 			return cx + advance;
 		}
 		return cx + bitmap_width;
-	}
-
-
-	// This code would clip characters at screen boundaries
-	if(max_x>screen_width){
-		max_x=screen_width;
-	}
-	if(min_x<0){
-		min_x=0;
-	}
-
-	if(max_y>screen_height){
-		max_y=screen_height;
-	}
-	if(min_y<0){
-		min_y=0;
 	}
 
 

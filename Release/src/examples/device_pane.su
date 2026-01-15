@@ -1,0 +1,2 @@
+device_pane.c:22:6:Print_Battery_Level	64	static
+device_pane.c:66:6:Device_Panel	112	static

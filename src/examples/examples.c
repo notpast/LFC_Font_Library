@@ -18,10 +18,6 @@
 
 
 
-
-
-
-
 void Simple_Print_Text(DISPLAY_CONTEXT * main_display){
 
 	// Create print form
@@ -127,16 +123,16 @@ void Text_With_Boundary_Box(DISPLAY_CONTEXT * main_display){
 	print_form.spacing = 0;
 
 	// Padding text
-	print_form.padding = 8;
+	print_form.padding = 6;
 
 	// Text
-	uint8_t str[]="LFC Font";
+	uint8_t str[]="LFC Font Lib";
 
 	// Text position X coordinate
-	int16_t pos_x=20;
+	int16_t pos_x=0;
 
 	// Text position Y coordinate
-	int16_t pos_y=30;
+	int16_t pos_y=20;
 
 	// Clear display
 	SSD1306_Clear();
