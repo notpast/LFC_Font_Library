@@ -144,7 +144,7 @@ void Font_Awesome_Example(DISPLAY_CONTEXT * main_display){
 		Print_Battery_Level(&print_form,(uint8_t)((counter>>3)%100));
 
 		// Print big icons
-		caret_x=pos_x;
+		caret_x=pos_x; // start x position
 		for(uint8_t i=0;i<13;i++){
 			// Print icon and return next caret position for next icon
 			caret_x=LFC_Print_Utf32_Chr(&big_icons_form,big_icons[i], caret_x, pos_y);

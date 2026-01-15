@@ -1079,30 +1079,12 @@ int16_t LFC_Print_Utf32_Chr(PRINT_FORM *print_form,uint32_t chr,int16_t pos_x,in
 
 	uint8_t str[7];
 
-
 	// Convert utf-32 to utf-8
 	if(LFC_Utf32_To_Utf8(chr,str)==0){
 		return 0;
 	}
 
-	// If set boundary box draw it and show string
-	if(print_form->config & LFC_BOUNDING_BOX){
-		LFC_RECT rect;
-		LFC_Str_Rect(print_form,str,pos_x,pos_y,&rect);
-
-		uint8_t fill;
-		if(print_form->config & LFC_INVERT){
-			fill=1;
-		}else{
-			fill=0;
-		}
-
-		LFC_Draw_Rect(print_form->display_context,&rect, fill,0);
-		return _LFC_Print(print_form,str, pos_x, pos_y)+ 2*print_form->padding;
-	}
-
-	// Show string Without boundary box
-	return _LFC_Print(print_form,str, pos_x, pos_y);
+	return LFC_Print(print_form, str, pos_x, pos_y);
 }
 
 

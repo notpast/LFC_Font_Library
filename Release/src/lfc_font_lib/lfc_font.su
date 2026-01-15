@@ -9,5 +9,5 @@ lfc_font.c:866:9:LFC_Print	40	static
 lfc_font.c:911:9:LFC_Utf32_To_Utf8	8	static
 lfc_font.c:982:9:LFC_Copy_Print_Form	0	static
 lfc_font.c:1012:9:LFC_Check_Font	16	static
-lfc_font.c:1070:9:LFC_Print_Utf32_Chr	48	static
-lfc_font.c:1112:9:LFC_Utf32_Char_Rect	40	static
+lfc_font.c:1070:9:LFC_Print_Utf32_Chr	32	static
+lfc_font.c:1094:9:LFC_Utf32_Char_Rect	40	static
