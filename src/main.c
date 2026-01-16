@@ -139,9 +139,9 @@ int main(void) {
 
 	//Simple_Print_Text(&main_display);
 
-	Text_With_Extra_Space(&main_display);
+	//Text_With_Extra_Space(&main_display);
 
-	Text_With_Boundary_Box(&main_display);
+	//Text_With_Boundary_Box(&main_display);
 
 
 	Font_Awesome_Example(&main_display);

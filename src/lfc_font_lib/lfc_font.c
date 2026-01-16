@@ -4,14 +4,30 @@
 
 
 
+
 /**
- * @brief Converts UTF-8 character code to UTF-32 code (4 bytes)
+ * @brief Converts UTF-8 character codes to UTF-32 code (4-byte array)
+ *        Supports 1-6 byte UTF-8 per RFC 2279.
  *
- * @param str: Input UTF-8 encoded string
- * @param u32_code: Output UTF-32 code (4 byte array)
+ * @param str: Input UTF-8 encoded string (Must be null-terminated).
+ * @param u32_code: Output 4-byte array representing the UTF-32 code point.
+ *        Processed byte-by-byte to ensure Endian-Independence.
  *
- * @return: UTF-8 byte length consumed, 0 if error
+ * @return: UTF-8 byte length, 0 if error.
  *
+ * @note: Modern UTF-8 (RFC 3629) is limited to 4 bytes (U+10FFFF).
+ *        This function maintains legacy support for older, wider specifications.
+ *
+ *
+ * UTF-8 Sequence Detection Table:
+ * | First Byte | Mask  | Pattern | Total Bytes | Data Bits |
+ * |------------|-------|---------|-------------|-----------|
+ * | 1111110x   | 0xFE  | 0xFC    | 6           | 1         |
+ * | 111110xx   | 0xFC  | 0xF8    | 5           | 2         |
+ * | 11110xxx   | 0xF8  | 0xF0    | 4           | 3         |
+ * | 1110xxxx   | 0xF0  | 0xE0    | 3           | 4         |
+ * | 110xxxxx   | 0xE0  | 0xC0    | 2           | 5         |
+ * | 0xxxxxxx   | -     | -       | 1 (ASCII)   | 7         |
  */
 
  uint8_t LFC_Utf8_To_Utf32(const uint8_t * str, uint8_t * u32_code) {
@@ -21,59 +37,69 @@
 		return 0;
 	}
 
-	uint8_t i = 0, len = 1, utf8_byte_count = 0;
-	uint8_t u;
-
-
-	const uint8_t u8[5] = { 0xFE, 0xFC, 0xF8, 0xF0, 0xE0 }; // Comparison masks
-	const uint8_t c8[5] = { 0xFC, 0xF8, 0xF0, 0xE0, 0xC0 }; // Expected patterns
+	uint8_t i = 0;
+	uint8_t utf8_byte_len = 0;
 
 	// Clear UTF-32 output array (4 bytes)
-	for (u = 0; u < 4; u++) {
+	for (uint8_t u = 0; u < 4; u++) {
 		u32_code[u] = 0;
 	}
 
-	// Check if character is multi-byte UTF-8 (above ASCII range)
-	if ((*str) > 127) {
-		utf8_byte_count = 0;
-		for (i = 0; i < 5; i++) {
-			if ((*str & u8[i]) == c8[i]) {
-				utf8_byte_count = 5 - i;
-				u32_code[0] = (*str) & (0xFF >> (7 - i));
-				break;
-			}
+	// Check if character is multi-byte UTF-8 (non-ASCII)
+	if ((*str) <= 127) {
+		u32_code[0] = *str;
+		return 1; // Return utf8 byte length
+	}
+
+
+	// --- Multi-byte UTF-8 processing ---
+
+	const uint8_t u8[5] = { 0xE0, 0xF0, 0xF8, 0xFC, 0xFE }; // Comparison masks
+	const uint8_t c8[5] = { 0xC0, 0xE0, 0xF0, 0xF8, 0xFC }; // Expected patterns
+
+
+	utf8_byte_len = 0;
+	// Check utf8 byte count
+	for (i = 0; i < 5; i++) {
+		if ((*str & u8[i]) == c8[i]) {
+
+			// Utf-8 total byte length: i=0 2 bytes, i=4 6 bytes length
+			utf8_byte_len = i + 2;
+
+			// Masked data bits
+			u32_code[0] = (*str) & ( 0xFF >> ( i + 3 ));
+			break;
 		}
-		if (utf8_byte_count == 0) {
+	}
+
+	// Check if utf8 valid start byte
+	if (utf8_byte_len == 0) {
+		return 0; // UTF-8 start byte error
+	}
+
+	// First byte already processed, start from index 1 for continuation bytes
+	for (i = 1; i < utf8_byte_len; i++) {
+		str++;
+		// Check for string termination
+		if (*str == 0) {
 			return 0;
 		}
-		// Process continuation bytes (10xxxxxx format)
-		for (i = 0; i < utf8_byte_count; i++) {
-			str++;
-			len++;
-			// Check for string termination
-			if (*str == 0) {
-				return 0;
-			}
-			// Validate continuation byte format (must start with 10)
-			if ((*str & 0xC0) != 0x80) {
-				return 0;
-			}
-
-			// Shift left 6-bit
-			for (u = 3; u > 0; u--) {
-				u32_code[u] <<= 6;
-				u32_code[u] |= (u32_code[u - 1] >> 2);
-			}
-			u32_code[0] <<= 6;
-			u32_code[0] |= ((*str) & 0x3F);
+		// Validate continuation byte format (must start with 10)
+		if ((*str & 0xC0) != 0x80) {
+			return 0;
 		}
-	} else {
-		// Single byte ASCII character - direct copy
-		u32_code[0] = *str;
+
+		// Shift left 6-bit
+		for (uint8_t u = 3; u > 0; u--) {
+			u32_code[u] <<= 6;
+			u32_code[u] |= (u32_code[u - 1] >> 2);
+		}
+		u32_code[0] <<= 6;
+		u32_code[0] |= ((*str) & 0x3F);
 	}
 
 	// Return total bytes consumed from input string
-	return len;
+	return utf8_byte_len;
 }
 
 
@@ -175,6 +201,19 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 
 }
 
+
+/**
+ * @brief Get a pixel bit (0/1) from monochrome bitmap font data
+ *
+ * @param font          Pointer to font bitmap data (byte array)
+ * @param ind           Character index offset in font data
+ * @param bitmap_width  Character width in bits
+ * @param fx            X coordinate within character (0 = leftmost)
+ * @param fy            Y coordinate within character (0 = topmost)
+ *
+ * @return uint8_t      Pixel value: 0 (clear) or 1 (set)
+ *
+ */
 
 static inline uint8_t LFC_Get_Bit(const uint8_t *font,uint16_t ind,uint16_t bitmap_width,uint16_t fx,uint16_t fy){
 
@@ -423,7 +462,7 @@ static int16_t _LFC_Print(PRINT_FORM * print_form, const uint8_t * str, int16_t 
 	// Parse font header to get font properties
 	ind = 0;
 	font_signature = font[ind++];
-	if (font_signature != 0xC8) {
+	if (font_signature != LFC_C8_FONT_SIGNATURE) {
 		return 0; // Invalid font signature
 	}
 
