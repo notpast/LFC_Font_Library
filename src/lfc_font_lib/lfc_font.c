@@ -968,17 +968,16 @@ int16_t LFC_Print(PRINT_FORM * print_form, const uint8_t * str, int16_t pos_x, i
  *        The output buffer must have at least 7 bytes of available space
  */
 uint8_t LFC_Utf32_To_Utf8(uint32_t utf32_c, uint8_t* utf8_s) {
-	uint32_t us8_len;
-	uint32_t i;
+	uint8_t us8_len;
 	uint8_t mask = 0xFF;
 
 	// Check null pointer
-	if(utf8_s==NULL || utf32_c==0){
+	if(utf8_s==NULL){
 		return 0;
 	}
 
-	// Fill utf-8 array to zero
-    for (i = 0; i < 7; i++) {
+	// Zero-initialize buffer to ensure null-termination and prevent data leakage for any sequence length.
+    for (uint8_t i = 0; i < 7; i++) {
         utf8_s[i] = 0;
     }
 
