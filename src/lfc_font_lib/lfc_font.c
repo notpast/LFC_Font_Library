@@ -16,7 +16,7 @@
  * @return: UTF-8 byte length, 0 if error.
  *
  * @note: Modern UTF-8 (RFC 3629) is limited to 4 bytes (U+10FFFF).
- *        This function maintains legacy support for older, wider specifications.
+ *        This function maintains legacy support for wider specifications.
  *
  *
  * UTF-8 Sequence Detection Table:
@@ -45,20 +45,21 @@
 		u32_code[u] = 0;
 	}
 
-	// Check if character is multi-byte UTF-8 (non-ASCII)
+	// Check if character is ASCII
 	if ((*str) <= 127) {
 		u32_code[0] = *str;
 		return 1; // Return utf8 byte length
 	}
-
 
 	// --- Multi-byte UTF-8 processing ---
 
 	const uint8_t u8[5] = { 0xE0, 0xF0, 0xF8, 0xFC, 0xFE }; // Comparison masks
 	const uint8_t c8[5] = { 0xC0, 0xE0, 0xF0, 0xF8, 0xFC }; // Expected patterns
 
+	uint32_t test_code = 0;
 
 	utf8_byte_len = 0;
+
 	// Check utf8 byte count
 	for (i = 0; i < 5; i++) {
 		if ((*str & u8[i]) == c8[i]) {
@@ -67,7 +68,7 @@
 			utf8_byte_len = i + 2;
 
 			// Masked data bits
-			u32_code[0] = (*str) & ( 0xFF >> ( i + 3 ));
+			test_code = (*str) & ( 0xFF >> ( i + 3 ));
 			break;
 		}
 	}
@@ -84,18 +85,43 @@
 		if (*str == 0) {
 			return 0;
 		}
-		// Validate continuation byte format (must start with 10)
+		// Validate continuation byte format (must start with 10 binary)
 		if ((*str & 0xC0) != 0x80) {
 			return 0;
 		}
 
 		// Shift left 6-bit
-		for (uint8_t u = 3; u > 0; u--) {
-			u32_code[u] <<= 6;
-			u32_code[u] |= (u32_code[u - 1] >> 2);
-		}
-		u32_code[0] <<= 6;
-		u32_code[0] |= ((*str) & 0x3F);
+		test_code = (test_code << 6) | ((*str) & 0x3F);
+	}
+
+	// Check overlong encoding
+	switch(utf8_byte_len){
+		case 2:
+			if(test_code<0X80) return 0;
+			break;
+		case 3:
+			if(test_code<0X800) return 0;
+			break;
+		case 4:
+			if(test_code<0x10000) return 0;
+			break;
+		case 5:
+			if(test_code<0x200000) return 0;
+			break;
+		case 6:
+			if(test_code<0X4000000) return 0;
+			break;
+	}
+
+	// Surrogate pair values are invalid in UTF-8
+	if (test_code >= 0xD800 && test_code <= 0xDFFF) {
+	    return 0;
+	}
+
+	// Save little endian
+	for(int8_t j=0;j<4;j++){
+		u32_code[j] = test_code&0xFF;
+		test_code   = test_code>>8;
 	}
 
 	// Return total bytes consumed from input string
@@ -144,7 +170,7 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
         ind = cmap_start + list_current * 6;
 
 		// Compare 4-byte UTF-32 code with font entry
-		for (i = 3; i > -1; i--) {
+		for (i = 3; i>-1 ; i--) {
 			if (u32_code[i] < font[ind + i]){
 				list_end = list_current-1;
 				break;
@@ -202,30 +228,6 @@ uint16_t LFC_Get_Chr_Index(const uint8_t * font, const uint8_t * u32_code, uint1
 }
 
 
-/**
- * @brief Get a pixel bit (0/1) from monochrome bitmap font data
- *
- * @param font          Pointer to font bitmap data (byte array)
- * @param ind           Character index offset in font data
- * @param bitmap_width  Character width in bits
- * @param fx            X coordinate within character (0 = leftmost)
- * @param fy            Y coordinate within character (0 = topmost)
- *
- * @return uint8_t      Pixel value: 0 (clear) or 1 (set)
- *
- */
-
-static inline uint8_t LFC_Get_Bit(const uint8_t *font,uint16_t ind,uint16_t bitmap_width,uint16_t fx,uint16_t fy){
-
-	uint16_t byte_index=(fy * bitmap_width + fx);
-	uint8_t  bit_index = 7 - (byte_index & 0x07); // calculate bit address  font_index%8
-	byte_index = ind + (byte_index >> 3);         // calculate byte address font_index/8
-
-	// Extract pixel value from bitmap data (1 bit per pixel)
-	uint8_t bit_status=(font[byte_index] >> bit_index) & 0x01;
-
-	return bit_status;
-}
 
 /**
  * @brief Renders a single character to the display
@@ -375,6 +377,8 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 			fy = y - min_y;
 		}
 
+		uint16_t y_index = fy * bitmap_width;
+
 		for (x = min_x; x < max_x; x++) {
 
 			// Check reserve x axis
@@ -385,18 +389,13 @@ static int16_t _LFC_Print_Chr(PRINT_FORM * print_form,uint16_t ind, int16_t cx, 
 				fx = x - min_x;
 			}
 
-			/*
-			uint16_t byte_index=(fy * bitmap_width + fx);
-			uint8_t  bit_index = 7 - (byte_index & 0x07); // calculate bit address  font_index%8
-			byte_index = ind + (byte_index >> 3);         // calculate byte address font_index/8
+
+			uint16_t byte_index = (y_index + fx);
+			uint8_t  bit_index  = 7 - (byte_index & 0x07); // calculate bit address  font_index%8
+			byte_index = ind + (byte_index >> 3);          // calculate byte address font_index/8
 
 			// Extract pixel value from bitmap data (1 bit per pixel)
-			//bit_status = GET_PIXEL((&font[ind]), (fy * bitmap_width + fx));
-
-			bit_status=(font[byte_index]>>bit_index)&0x01;
-			*/
-
-			bit_status = LFC_Get_Bit(font, ind, bitmap_width, fx, fy);
+			bit_status=(font[byte_index] >> bit_index) & 0x01;
 
 
 			// Apply inversion if requested

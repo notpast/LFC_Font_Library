@@ -127,7 +127,7 @@ void Text_With_Boundary_Box(DISPLAY_CONTEXT * main_display){
 	print_form.padding = 6;
 
 	// Text
-	uint8_t str[]="A";
+	uint8_t str[]="Test string";
 
 	// Text position X coordinate
 	int16_t pos_x=0;
